@@ -34,7 +34,7 @@ jobs:
       - name: Build PlatformIO Project
         run: pio run
       
-      - name: Deploy release
+      - name: Deploy release to external repo
         env:
           GH_TOKEN: ${{ secrets.SECONDARY_PAT }}
 
@@ -47,6 +47,4 @@ jobs:
           else
             gh release create "$TAG" release.bin --title "Draft: $TAG" --notes "CRC=$CRC - Automated release for $TAG" -R "kevinhikaruevans/pio-action-test-releases" -d
           fi
-        
-        # TODO: append crc32 to binary name
 
