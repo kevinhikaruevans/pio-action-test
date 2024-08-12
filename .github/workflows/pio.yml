@@ -1,9 +1,6 @@
 name: PlatformIO CI
 
-on:
-  push:
-    tags:
-      - 'v*.*.*'  # Triggers the workflow on any tag that matches the pattern vX.X.X
+on: push
 
 jobs:
   test:
