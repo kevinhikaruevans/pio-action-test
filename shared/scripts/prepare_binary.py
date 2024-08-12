@@ -1,29 +1,45 @@
 import subprocess
+import re
+import array
+
 Import("env")
 
 print("Current CLI targets", COMMAND_LINE_TARGETS)
 print("Current Build targets", BUILD_TARGETS)
 
-def get_git_repo_name() -> str:
+HEADER_SIZE = 64
+
+def get_git_repo_name() -> bytes:
     try:
-        # Run the command to get the repo name
         result = subprocess.run(
             ["git", "config", "--get", "remote.origin.url"], 
             stdout=subprocess.PIPE, 
             text=True, 
             check=True
         )
-        print('result', result)
-        # Extract the directory name
+        match = re.search(r'([^/]+)\.git$', result.stdout.strip())
+        return match.group(1).encode()
         
     except:
-        return 'unknown'
+        return b'unknown'
     
 def post_program_action(source, target, env):
-    program_path = target[0].get_abspath()
+    program_path: str = source[0].get_abspath()
     repo_name = get_git_repo_name()
+
+    assert len(repo_name) < HEADER_SIZE, 'repo name exceeds header size'
     
-    print(">>> Program path", program_path, target)
+    if not program_path.endswith(".bin"):
+        print('<- program path does not end in bin - ignoring')
+        return
+    
+    header = bytearray(b'\x00' * HEADER_SIZE)
+    header[:len(repo_name)] = repo_name
+
+    with open(program_path, 'rb') as orig_binary:
+        with open(f"release.bin", 'wb') as new_binary:
+            new_binary.write(header)
+            new_binary.write(orig_binary.read())
     
 
 env.AddPostAction("buildprog", post_program_action)

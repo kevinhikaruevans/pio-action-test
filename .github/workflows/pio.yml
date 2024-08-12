@@ -23,8 +23,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install PlatformIO Core
-        run: pip install --upgrade platformio
+      - name: Install PlatformIO Core and CRC32
+        run: |
+          pip install --upgrade platformio
+          sudo apt-get install libarchive-zip-perl
 
       - name: Build PlatformIO Project
         run: pio run
@@ -36,7 +38,8 @@ jobs:
         run: |
           TAG=v$(date +%Y%m%d.%H%M%S)
           RELEASE_NAME="Release $TAG"
-          gh release create "$TAG" .pio/build/esp32-s3-devkitc-1/firmware.bin --title "$RELEASE_NAME" --notes "Automated release for $TAG" -R "kevinhikaruevans/pio-action-test-releases" 
+          CRC=$(crc32 ".pio/build/esp32-s3-devkitc-1/firmware.bin")
+          gh release create "$TAG" release.bin --title "$RELEASE_NAME" --notes "CRC=$CRC - Automated release for $TAG" -R "kevinhikaruevans/pio-action-test-releases" 
         
         # TODO: append crc32 to binary name
 
