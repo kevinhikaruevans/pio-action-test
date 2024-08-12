@@ -1,6 +1,9 @@
 name: PlatformIO CI
 
-on: push
+on:
+  push:
+    branches:
+      - '**'
 
 jobs:
   test:
@@ -39,7 +42,11 @@ jobs:
           TAG=v$(date +%Y%m%d.%H%M%S)
           RELEASE_NAME="Release $TAG"
           CRC=$(crc32 ".pio/build/esp32-s3-devkitc-1/firmware.bin")
-          gh release create "$TAG" release.bin --title "$RELEASE_NAME" --notes "CRC=$CRC - Automated release for $TAG" -R "kevinhikaruevans/pio-action-test-releases" 
+          if [[ ${{ github.ref_name }} == 'release' ]]; then
+            gh release create "$TAG" release.bin --title "Release: $TAG" --notes "CRC=$CRC - Automated release for $TAG" -R "kevinhikaruevans/pio-action-test-releases" 
+          else
+            gh release create "$TAG" release.bin --title "Draft: $TAG" --notes "CRC=$CRC - Automated release for $TAG" -R "kevinhikaruevans/pio-action-test-releases" -d
+          fi
         
         # TODO: append crc32 to binary name
 
