@@ -28,13 +28,15 @@ jobs:
 
       - name: Build PlatformIO Project
         run: pio run
-        
+      
       - name: Deploy release
         env:
           GH_TOKEN: ${{ github.token }}
-          GH_REPO: "kevinhikaruevans/pio-action-test-releases" # ${{ github.repository }}
+
         run: |
           TAG=v$(date +%Y%m%d.%H%M%S)
           RELEASE_NAME="Release $TAG"
-          gh release create "$TAG" .pio/build/esp32-s3-devkitc-1/firmware.bin --title "$RELEASE_NAME" --notes "Automated release for $TAG"
+          gh release create "$TAG" .pio/build/esp32-s3-devkitc-1/firmware.bin --title "$RELEASE_NAME" --notes "Automated release for $TAG" -R "kevinhikaruevans/pio-action-test-releases" 
+        
+        # TODO: append crc32 to binary name
 
