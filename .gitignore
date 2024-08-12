@@ -3,9 +3,3 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
-.vscode/settings.json
-
-sdkconfig.*
-
-# do not commit managed_components, they will be pulled on clean build
-managed_components/
